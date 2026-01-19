@@ -138,7 +138,17 @@
                 rows[i].style.display = rows[i].innerText.toLowerCase().includes(query) ? "" : "none";
             }
         }
+        // Locate this in your <script> section:
+const DB_URL = "https://script.google.com/macros/s/AKfycbyVfkPw3wYF3gzaY9pjbW_CWvHerNBnF2oE5rlIuDrtxmDNqhIt3EgboJDRs8U_wsYTWw/exec";
+
+// This function will now pull live data for every fan who visits
+async function loadData() {
+    const response = await fetch(DB_URL);
+    const allMovies = await response.json();
+    // Render logic continues...
+}
     </script>
 </body>
 
 </html>
+
