@@ -3,126 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indian Box Office | 2026 Live Dashboard</title>
+    <title>Indian Box Office | 2026 Live Portal</title>
     <style>
-        :root { --accent: #ff9933; --bg: #0b0e14; --card: #161b22; --text: #e6edf3; --highlight: #58a6ff; --mahesh: #ffcc00; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; line-height: 1.6; }
+        :root { --accent: #ff9933; --bg: #0b0e14; --card: #161b22; --text: #e6edf3; --red: #e50914; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+
+        /* --- Welcome Page Styles --- */
+        #welcome-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, #1a1a1a 0%, #000 100%); z-index: 1000; transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1); text-align: center; }
+        .welcome-title { font-size: 3.5rem; text-transform: uppercase; font-weight: 900; margin-bottom: 10px; }
+        .welcome-title span { color: var(--accent); }
+        .welcome-tag { font-size: 1rem; color: #8b949e; letter-spacing: 3px; margin-bottom: 30px; }
+
+        /* Poster Scroll Animation */
+        .poster-scroll { width: 100%; overflow: hidden; margin: 30px 0; background: rgba(255,255,255,0.05); padding: 20px 0; }
+        .poster-track { display: flex; gap: 20px; animation: scroll 25s linear infinite; width: max-content; }
+        .scroll-img { width: 160px; height: 240px; border-radius: 8px; border: 1px solid var(--accent); object-fit: cover; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        .enter-btn { padding: 15px 50px; font-size: 1.1rem; font-weight: bold; color: #000; background: var(--accent); border: none; border-radius: 50px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 20px rgba(255,153,51,0.4); }
+        .enter-btn:hover { background: #fff; transform: scale(1.05); }
+
+        /* --- Main Dashboard Styles --- */
+        #main-dashboard { display: none; }
+        .ticker-wrap { width: 100%; overflow: hidden; background: #000; border-bottom: 2px solid var(--accent); white-space: nowrap; padding: 10px 0; position: sticky; top: 0; z-index: 500; }
+        .ticker { display: inline-block; animation: marquee 40s linear infinite; }
+        .ticker-item { display: inline-block; padding: 0 50px; font-weight: bold; font-size: 0.85rem; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
         header { background: #000; padding: 30px 5%; border-bottom: 4px solid var(--accent); text-align: center; }
         .container { max-width: 1100px; margin: auto; padding: 20px; }
-        .section-title { border-left: 5px solid var(--accent); padding-left: 15px; margin: 40px 0 20px; color: var(--accent); display: flex; justify-content: space-between; align-items: center; }
-        
-        /* Dashboard Stats */
-        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-box { background: var(--card); padding: 20px; border-radius: 8px; border: 1px solid #30363d; text-align: center; transition: 0.3s; }
-        .stat-box:hover { border-color: var(--accent); transform: translateY(-5px); }
-        .stat-box h4 { margin: 0; font-size: 0.8rem; color: #8b949e; text-transform: uppercase; }
-        .stat-box p { font-size: 1.5rem; font-weight: bold; margin: 10px 0; color: #fff; }
 
-        /* Special Section: Mahesh Babu */
-        .mahesh-section { background: linear-gradient(135deg, #1a1a1a 0%, #332200 100%); padding: 25px; border-radius: 15px; border: 2px solid var(--mahesh); margin-bottom: 40px; }
-        .mahesh-title { color: var(--mahesh); font-size: 1.8rem; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; }
+        /* Navigation & Interaction */
+        .search-bar { width: 100%; max-width: 600px; padding: 12px 25px; background: #21262d; border: 1px solid #30363d; border-radius: 30px; color: #fff; margin: 20px auto; display: block; }
+        .tab-menu { display: flex; flex-wrap: wrap; gap: 10px; margin: 30px 0; justify-content: center; }
+        .tab-btn { background: #21262d; border: 1px solid #30363d; color: #8b949e; padding: 10px 20px; cursor: pointer; border-radius: 8px; font-weight: bold; }
+        .tab-btn.active { background: var(--accent); color: #000; }
+
+        /* Data Displays */
+        .featured-header { display: flex; background: #161b22; border-radius: 12px; border: 1px solid var(--accent); margin-bottom: 25px; overflow: hidden; }
+        .featured-img { width: 200px; height: 300px; object-fit: cover; }
+        .featured-info { padding: 30px; }
+        .featured-info h2 { margin: 0; color: var(--accent); font-size: 2.2rem; }
         
-        /* Tables */
-        .table-wrapper { overflow-x: auto; background: var(--card); border-radius: 12px; border: 1px solid #30363d; margin-bottom: 30px; }
+        .table-wrapper { background: var(--card); border-radius: 12px; border: 1px solid #30363d; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
-        th { background: #21262d; padding: 15px; text-align: left; font-size: 0.9rem; color: var(--highlight); }
+        th { background: #21262d; padding: 15px; text-align: left; color: var(--accent); }
         td { padding: 15px; border-bottom: 1px solid #30363d; }
-        .amount { color: #3fb950; font-weight: bold; }
-        .upcoming { color: #f0883e; font-style: italic; }
-        .badge { background: #238636; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; }
-        .rank-top { color: gold; font-weight: bold; }
+        .verdict { padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .blockbuster { background: #238636; } .live { background: var(--red); }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>INDIAN <span style="color:var(--accent)">BOX OFFICE</span> TRACKER</h1>
-    <p>Real-Time Analytics & Upcoming Forecasts | Jan 2026</p>
-</header>
-
-<div class="container">
-    
-    <h2 class="section-title">2025 Global Top Grossers <span>(Full Year)</span></h2>
-    <div class="stats-row">
-        <div class="stat-box"><h4>Yearly Champion</h4><p>Dhurandhar</p></div>
-        <div class="stat-box"><h4>Highest ROI</h4><p>Thamma</p></div>
-        <div class="stat-box"><h4>Tollywood King</h4><p>Pushpa 2</p></div>
-    </div>
-
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>Movie Title</th>
-                    <th>Language</th>
-                    <th>Worldwide Gross</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="hits-2025">
-                </tbody>
-        </table>
-    </div>
-
-    <div class="mahesh-section">
-        <div class="mahesh-title">⭐ Superstar Mahesh Babu: The Next Frontier</div>
-        <p>Currently the most tracked actor in Indian cinema as he prepares for the global epic <strong>Varanasi (SSMB29)</strong>.</p>
-        <div class="stats-row" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
-            <div class="stat-box"><h4>Project</h4><p>Varanasi</p></div>
-            <div class="stat-box"><h4>Director</h4><p>SS Rajamouli</p></div>
-            <div class="stat-box"><h4>Budget</h4><p>₹1,300 Cr</p></div>
-            <div class="stat-box"><h4>Release</h4><p>April 2027</p></div>
+    <div id="welcome-page">
+        <div class="welcome-tag">SINCE 2024</div>
+        <h1 class="welcome-title">BOX OFFICE <span>COLLECTIONS</span></h1>
+        
+        <div class="poster-scroll">
+            <div class="poster-track">
+                <img src="https://upload.wikimedia.org/wikipedia/en/9/93/Baahubali_2_The_Conclusion_2017_poster.jpg" class="scroll-img">
+                <img src="https://upload.wikimedia.org/wikipedia/en/d/d0/K.G.F_Chapter_2.jpg" class="scroll-img">
+                <img src="https://upload.wikimedia.org/wikipedia/en/9/99/Dangal_Poster.jpg" class="scroll-img">
+                <img src="https://image.tmdb.org/t/p/w500/bO6y6S3Kz6zS5f5f5f5f5f.jpg" class="scroll-img"> <img src="https://upload.wikimedia.org/wikipedia/en/c/cf/2.0_film_poster.jpg" class="scroll-img">
+                <img src="https://upload.wikimedia.org/wikipedia/en/9/93/Baahubali_2_The_Conclusion_2017_poster.jpg" class="scroll-img">
+                <img src="https://upload.wikimedia.org/wikipedia/en/d/d0/K.G.F_Chapter_2.jpg" class="scroll-img">
+                <img src="https://upload.wikimedia.org/wikipedia/en/9/99/Dangal_Poster.jpg" class="scroll-img">
+            </div>
         </div>
-        <p style="font-size: 0.9rem; color: #8b949e;">*Note: "Varanasi" is being shot in 1.43:1 IMAX format—the first Indian film to do so.</p>
+
+        <button class="enter-btn" onclick="enterSite()">ENTER LIVE DASHBOARD</button>
     </div>
 
-    <h2 class="section-title">2026 Live Box Office & Forecast</h2>
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>Release Date</th>
-                    <th>Movie Title</th>
-                    <th>Lead Cast</th>
-                    <th>Gross / Expected</th>
-                </tr>
-            </thead>
-            <tbody id="forecast-2026">
-                </tbody>
-        </table>
+    <div id="main-dashboard">
+        <div class="ticker-wrap">
+            <div class="ticker">
+                <span class="ticker-item">⚡ Dhurandhar (Hindi) beats Pushpa 2 to become #1 Hindi Grosser in India! Total: ₹825 Cr+</span>
+                <span class="ticker-item">🎬 Mana Shankara Vara Prasad Garu (Telugu) dominates Sankranti charts with ₹222.5 Cr global haul!</span>
+                <span class="ticker-item">🔥 SSMB29 Update: Rajamouli & Mahesh Babu's 'Varanasi' pre-production in full swing!</span>
+                <span class="ticker-item">📈 The Raja Saab (Prabhas) holds strong at ₹196 Cr worldwide in 11 days!</span>
+            </div>
+        </div>
+
+        <header>
+            <h1>INDIAN BOX OFFICE <span>ANALYTICS</span></h1>
+        </header>
+
+        <div class="container">
+            <input type="text" id="movieSearch" class="search-bar" placeholder="Search for titles, records, or verdicts..." onkeyup="filterTable()">
+            
+            <div class="tab-menu">
+                <button class="tab-btn active" onclick="showTab('telugu')">TELUGU</button>
+                <button class="tab-btn" onclick="showTab('hindi')">HINDI</button>
+                <button class="tab-btn" onclick="showTab('tamil')">TAMIL</button>
+            </div>
+
+            <div id="displayArea"></div>
+        </div>
     </div>
 
-</div>
+    <script>
+        const movieData = {
+            telugu: {
+                featured: { t: "Baahubali 2", d: "The pride of Tollywood and India's biggest domestic hit.", i: "https://upload.wikimedia.org/wikipedia/en/9/93/Baahubali_2_The_Conclusion_2017_poster.jpg" },
+                list: [
+                    { r: 1, t: "Baahubali 2", g: "₹1,810 Cr", b: "₹250 Cr", v: "Blockbuster" },
+                    { r: 2, t: "Pushpa 2: The Rule", g: "₹1,742 Cr", b: "₹500 Cr", v: "Blockbuster" },
+                    { r: 3, t: "RRR", g: "₹1,387 Cr", b: "₹550 Cr", v: "Blockbuster" },
+                    { r: 4, t: "Mana Shankara Vara Prasad Garu", g: "₹222.5 Cr*", b: "₹200 Cr", v: "Live" },
+                    { r: 5, t: "The Raja Saab", g: "₹196.6 Cr*", b: "₹350 Cr", v: "Live" }
+                ]
+            },
+            hindi: {
+                featured: { t: "Dangal", d: "Highest grossing Indian film globally due to China success.", i: "https://upload.wikimedia.org/wikipedia/en/9/99/Dangal_Poster.jpg" },
+                list: [
+                    { r: 1, t: "Dangal", g: "₹2,024 Cr", b: "₹70 Cr", v: "Blockbuster" },
+                    { r: 2, t: "Dhurandhar", g: "₹1,328 Cr", b: "₹225 Cr", v: "Blockbuster" },
+                    { r: 3, t: "Jawan", g: "₹1,148 Cr", b: "₹300 Cr", v: "Blockbuster" },
+                    { r: 4, t: "Pathaan", g: "₹1,050 Cr", b: "₹250 Cr", v: "Blockbuster" }
+                ]
+            }
+        };
 
-<script>
-    const hits2025 = [
-        { r: 1, t: "Dhurandhar", l: "Hindi", g: "₹1,328.2 Cr", s: "Blockbuster" },
-        { r: 2, t: "Pushpa 2: The Rule", l: "Telugu", g: "₹1,210.4 Cr*", s: "All-Time Blockbuster" },
-        { r: 3, t: "Kantara: Chapter 1", l: "Kannada", g: "₹852.0 Cr", s: "Super Hit" },
-        { r: 4, t: "Chhaava", l: "Hindi", g: "₹804.8 Cr", s: "Hit" },
-        { r: 5, t: "Saiyaara", l: "Hindi", g: "₹579.2 Cr", s: "Average" }
-    ];
+        function enterSite() {
+            document.getElementById('welcome-page').style.transform = 'translateY(-100%)';
+            setTimeout(() => {
+                document.getElementById('welcome-page').style.display = 'none';
+                document.getElementById('main-dashboard').style.display = 'block';
+                renderView('telugu');
+            }, 800);
+        }
 
-    const upcoming2026 = [
-        { d: "12 Jan 2026", t: "Mana Shankara Vara Prasad Garu", c: "Chiranjeevi", e: "₹225 Cr (Live)" },
-        { d: "09 Jan 2026", t: "The Raja Saab", c: "Prabhas", e: "₹201 Cr (Live)" },
-        { d: "23 Jan 2026", t: "Border 2", c: "Sunny Deol", e: "₹750 Cr (Exp.)" },
-        { d: "19 Mar 2026", t: "Dhurandhar 2", c: "Ranveer Singh", e: "₹1,100+ Cr (Exp.)" },
-        { d: "Diwali 2026", t: "Ramayana: Part 1", c: "Ranbir Kapoor", e: "₹1,500+ Cr (Exp.)" }
-    ];
+        function renderView(lang) {
+            const data = movieData[lang];
+            let html = `
+                <div class="featured-header">
+                    <img src="${data.featured.i}" class="featured-img" onerror="this.src='https://via.placeholder.com/200x300'">
+                    <div class="featured-info">
+                        <p style="color:var(--accent); font-weight:bold;">#1 ALL-TIME CHAMPION</p>
+                        <h2>${data.featured.t}</h2>
+                        <p>${data.featured.d}</p>
+                    </div>
+                </div>
+                <div class="table-wrapper"><table id="movieTable">
+                <thead><tr><th>Rank</th><th>Title</th><th>Global Gross</th><th>Budget</th><th>Verdict</th></tr></thead><tbody>`;
+            data.list.forEach(m => {
+                html += `<tr><td>#${m.r}</td><td><strong>${m.t}</strong></td><td style="color:#3fb950"><b>${m.g}</b></td><td>${m.b}</td><td><span class="verdict ${m.v.toLowerCase()}">${m.v}</span></td></tr>`;
+            });
+            html += `</tbody></table></div>`;
+            document.getElementById('displayArea').innerHTML = html;
+        }
 
-    const h25 = document.getElementById('hits-2025');
-    hits2025.forEach(m => {
-        const rankClass = m.r <= 3 ? 'rank-top' : '';
-        h25.innerHTML += `<tr><td class="${rankClass}">#${m.r}</td><td><strong>${m.t}</strong></td><td>${m.l}</td><td class="amount">${m.g}</td><td><span class="badge">${m.s}</span></td></tr>`;
-    });
+        function showTab(lang) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            renderView(lang);
+        }
 
-    const f26 = document.getElementById('forecast-2026');
-    upcoming2026.forEach(m => {
-        f26.innerHTML += `<tr><td>${m.d}</td><td><strong>${m.t}</strong></td><td>${m.c}</td><td class="upcoming">${m.e}</td></tr>`;
-    });
-</script>
-
+        function filterTable() {
+            const val = document.getElementById('movieSearch').value.toLowerCase();
+            const rows = document.getElementById('movieTable').getElementsByTagName('tr');
+            for (let i = 1; i < rows.length; i++) {
+                rows[i].style.display = rows[i].innerText.toLowerCase().includes(val) ? "" : "none";
+            }
+        }
+    </script>
 </body>
 </html>
