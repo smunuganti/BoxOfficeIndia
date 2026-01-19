@@ -57,6 +57,7 @@
             </div>
             
             <div class="tab-menu">
+                 <button class="tab-btn active" onclick="switchTab('latest')">LATEST</button>
                 <button class="tab-btn active" onclick="switchTab('telugu')">TELUGU</button>
                 <button class="tab-btn" onclick="switchTab('hindi')">HINDI</button>
                 <button class="tab-btn" onclick="switchTab('tamil')">TAMIL</button>
@@ -70,6 +71,12 @@
 
     <script>
         const movieData = {
+          latest: [
+                { r: 1, t: "Mana Shankara Vara Prasad Garu", h: "Chiranjeevi", d: "Anil Ravipudi", y: 2026, g: "₹304.5 Cr", v: "blockbuster" },
+                { r: 2, t: "TheRajaSaab", h: "Prabhas", d: "Maruthi", y: 2026, g: "₹201 Cr", v: "Flop" },
+                { r: 3, t: "RRR", h: "NTR, Ram Charan", d: "S.S. Rajamouli", y: 2022, g: "₹1,316 Cr", v: "blockbuster" },
+                { r: 4, t: "Mana Shankara Vara Prasad Garu", h: "Chiranjeevi", d: "Anil Ravipudi", y: 2026, g: "₹304.5 Cr", v: "blockbuster" }
+            ],
             telugu: [
                 { r: 1, t: "Baahubali 2", h: "Prabhas", d: "S.S. Rajamouli", y: 2017, g: "₹1,810 Cr", v: "blockbuster" },
                 { r: 2, t: "Pushpa 2: The Rule", h: "Allu Arjun", d: "Sukumar", y: 2024, g: "₹1,750 Cr", v: "blockbuster" },
@@ -133,4 +140,5 @@
         }
     </script>
 </body>
+
 </html>
