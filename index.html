@@ -2,153 +2,245 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indian Box Office | Analytics Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Indian Box Office | Live Data Hub</title>
     <style>
-        :root { --accent: #ff9933; --bg: #0b0e14; --card: #161b22; --text: #e6edf3; --gold: #ffd700; --green: #3fb950; }
-        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
-        
-        /* Welcome Hero */
-        #welcome-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, #1a1a1a 0%, #000 100%); z-index: 1000; transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1); text-align: center; }
-        .welcome-title { font-size: 3.5rem; text-transform: uppercase; font-weight: 900; }
+        /* CSS VARIABLES */
+        :root {
+            --accent: #ff9933; --bg: #0b0e14; --card: #161b22;
+            --text: #e6edf3; --gold: #ffd700; --green: #238636;
+            --red: #da3633; --yellow: #d29922; --tab-bg: #21262d;
+        }
+
+        /* LIGHT THEME VARIABLES */
+        body.light-theme {
+            --bg: #f6f8fa; --card: #ffffff; --text: #1f2328;
+            --tab-bg: #eaeef2;
+        }
+
+        body, html { 
+            margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; 
+            background-color: var(--bg); color: var(--text); 
+            transition: background-color 0.3s, color 0.3s;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* WELCOME SCREEN */
+        #welcome-page { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%); z-index: 2000; 
+            transition: transform 0.6s ease-in-out; text-align: center; 
+        }
+        .welcome-title { font-size: clamp(2rem, 8vw, 3.5rem); text-transform: uppercase; font-weight: 900; color: #fff; }
         .welcome-title span { color: var(--accent); }
-        .enter-btn { padding: 15px 50px; font-size: 1.1rem; font-weight: bold; color: #000; background: var(--accent); border: none; border-radius: 50px; cursor: pointer; transition: 0.3s; margin-top: 30px; box-shadow: 0 0 20px rgba(255,153,51,0.4); }
-        .enter-btn:hover { background: #fff; transform: scale(1.05); }
+        .enter-btn { 
+            padding: 15px 40px; font-size: 1.1rem; font-weight: bold; color: #000; 
+            background: var(--accent); border: none; border-radius: 50px; cursor: pointer; 
+            margin-top: 25px; box-shadow: 0 0 20px rgba(255,153,51,0.4); 
+        }
 
-        /* Dashboard */
-        #main-dashboard { display: none; padding-top: 40px; }
-        header { text-align: center; padding: 20px 0; border-bottom: 2px solid var(--accent); margin-bottom: 40px; }
-        header h1 { margin: 0; letter-spacing: 2px; }
+        /* LAYOUT */
+        #main-dashboard { display: none; }
+        header { text-align: center; padding: 20px 0; border-bottom: 2px solid var(--accent); }
+        .container { width: 92%; max-width: 1200px; margin: auto; padding: 15px 0; }
 
-        .container { max-width: 1200px; margin: auto; padding: 20px; }
-        .search-container { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #30363d; margin-bottom: 25px; }
-        .search-bar { width: 100%; padding: 15px; background: #0b0e14; border: 1px solid var(--accent); border-radius: 8px; color: #fff; font-size: 1rem; box-sizing: border-box; }
-
-        .tab-menu { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; justify-content: center; }
-        .tab-btn { background: #21262d; border: 1px solid #30363d; color: #8b949e; padding: 10px 20px; cursor: pointer; border-radius: 8px; font-weight: bold; }
+        /* TABS */
+        .tab-menu { 
+            display: flex; overflow-x: auto; gap: 8px; padding: 10px 5px;
+            scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .tab-menu::-webkit-scrollbar { display: none; }
+        .tab-btn { 
+            background: var(--tab-bg); border: 1px solid rgba(128,128,128,0.2); 
+            color: var(--text); padding: 10px 18px; cursor: pointer; border-radius: 8px; 
+            font-weight: bold; flex: 0 0 auto; font-size: 0.9rem;
+        }
         .tab-btn.active { background: var(--accent); color: #000; }
 
-        .table-wrapper { background: var(--card); border-radius: 12px; border: 1px solid #30363d; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #21262d; padding: 15px; text-align: left; color: var(--accent); font-size: 0.85rem; text-transform: uppercase; }
-        td { padding: 15px; border-bottom: 1px solid #30363d; font-size: 0.9rem; }
-        .meta { font-size: 0.75rem; color: #8b949e; display: block; margin-top: 4px; }
+        /* TABLE */
+        .table-wrapper { 
+            background: var(--card); border-radius: 12px; border: 1px solid rgba(128,128,128,0.2); 
+            overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 10px;
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 550px; }
+        th { background: rgba(128,128,128,0.1); padding: 12px; text-align: left; color: var(--accent); font-size: 0.75rem; text-transform: uppercase; }
+        td { padding: 15px 12px; border-bottom: 1px solid rgba(128,128,128,0.1); font-size: 0.9rem; }
+
+        /* VERDICTS & BADGES */
+        .verdict { padding: 4px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: #fff; min-width: 90px; display: inline-block; text-align: center; }
+        .blockbuster { background: var(--green); }
+        .average { background: var(--yellow); color: #000; }
+        .flop { background: var(--red); }
+        .hit { background: #1f6feb; }
         
-        .verdict { padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; color: #fff; }
-        .blockbuster { background: #238636; } .hit { background: #1f6feb; } .average { background: #6e7681; } .upcoming { background: var(--gold); color: #000; }
+        .badge-live { background: var(--red); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; animation: blink 1.5s infinite; margin-left: 8px; }
+        @keyframes blink { 50% { opacity: 0.3; } }
+
+        /* THEME TOGGLE */
+        .theme-toggle { 
+            position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; 
+            border-radius: 50%; background: var(--accent); color: #000; border: none; 
+            cursor: pointer; font-size: 1.5rem; z-index: 3000; display: flex; align-items: center; justify-content: center; 
+        }
+
+        /* ADMIN PANEL */
+        .admin-panel { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--gold); display: none; margin-bottom: 20px; }
+        .admin-grid { display: flex; flex-direction: column; gap: 10px; }
+        .admin-grid input, .admin-grid select { padding: 12px; border-radius: 6px; border: 1px solid rgba(128,128,128,0.3); background: var(--bg); color: var(--text); width: 100%; box-sizing: border-box; }
+        .save-btn { background: var(--gold); color: #000; border: none; padding: 15px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%; }
+
+        @media (min-width: 768px) {
+            .admin-grid { flex-direction: row; flex-wrap: wrap; }
+            .admin-grid input, .admin-grid select { flex: 1 1 200px; }
+            .tab-menu { justify-content: center; overflow-x: visible; }
+        }
     </style>
 </head>
 <body>
 
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
+
     <div id="welcome-page">
         <h1 class="welcome-title">BOX OFFICE <span>ANALYTICS</span></h1>
-        <p style="color: #8b949e; letter-spacing: 2px;">INDIAN CINEMA DATA HUB</p>
-        <button class="enter-btn" onclick="enterSite()">EXPLORE DATA</button>
+        <button class="enter-btn" onclick="enterSite()">VIEW LIVE DATA</button>
     </div>
 
     <div id="main-dashboard">
-        <header>
-            <h1>INDIAN <span style="color:var(--accent)">BOX OFFICE</span></h1>
-        </header>
+        <header><h1>INDIAN <span style="color:var(--accent)">BOX OFFICE</span></h1></header>
 
         <div class="container">
-            <div class="search-container">
-                <input type="text" id="masterSearch" class="search-bar" placeholder="Search by Hero, Director, Year, or Language..." onkeyup="filterData()">
+            <div id="adminPanel" class="admin-panel">
+                <h3 style="color:var(--gold); margin-top:0;">Admin New Entry</h3>
+                <div class="admin-grid">
+                    <input type="text" id="newTitle" placeholder="Movie Title">
+                    <input type="number" id="newYear" placeholder="Year">
+                    <select id="newInd">
+                        <option value="telugu">Telugu</option>
+                        <option value="hindi">Hindi</option>
+                        <option value="tamil">Tamil</option>
+                        <option value="kannada">Kannada</option>
+                        <option value="malayalam">Malayalam</option>
+                    </select>
+                    <input type="text" id="newGross" placeholder="Collection (₹ Cr)">
+                    <select id="newVerdict">
+                        <option value="Blockbuster">Blockbuster</option>
+                        <option value="Hit">Hit</option>
+                        <option value="Average">Average</option>
+                        <option value="Flop">Flop</option>
+                    </select>
+                </div>
+                <button class="save-btn" onclick="submitToSheet()">PUBLISH UPDATES</button>
             </div>
-            
+
             <div class="tab-menu">
-                 <button class="tab-btn active" onclick="switchTab('latest')">LATEST</button>
-                <button class="tab-btn active" onclick="switchTab('telugu')">TELUGU</button>
+                <button class="tab-btn active" onclick="switchTab('latest')">LATEST</button>
+                <button class="tab-btn" onclick="switchTab('telugu')">TELUGU</button>
                 <button class="tab-btn" onclick="switchTab('hindi')">HINDI</button>
                 <button class="tab-btn" onclick="switchTab('tamil')">TAMIL</button>
-                <button class="tab-btn" onclick="switchTab('upcoming')">UPCOMING</button>
-                <button class="tab-btn" style="border: 1px solid var(--gold);" onclick="switchTab('mahesh')">SSMB SPECIAL</button>
+                <button class="tab-btn" onclick="switchTab('kannada')">KANNADA</button>
+                <button class="tab-btn" onclick="switchTab('malayalam')">MALAYALAM</button>
+                <button class="tab-btn" style="border: 1px solid var(--gold);" onclick="adminLogin()">ADMIN</button>
             </div>
 
             <div id="tableContent"></div>
+            <p style="text-align: center; color: var(--text); opacity: 0.6; font-size: 0.75rem; margin-top: 15px;">Scroll Table Horizontally for more →</p>
         </div>
     </div>
 
     <script>
-        const movieData = {
-          latest: [
-                { r: 1, t: "Mana Shankara Vara Prasad Garu", h: "Chiranjeevi", d: "Anil Ravipudi", y: 2026, g: "₹304.5 Cr", v: "blockbuster" },
-                { r: 2, t: "TheRajaSaab", h: "Prabhas", d: "Maruthi", y: 2026, g: "₹201 Cr", v: "Flop" },
-                { r: 3, t: "RRR", h: "NTR, Ram Charan", d: "S.S. Rajamouli", y: 2022, g: "₹1,316 Cr", v: "blockbuster" },
-                { r: 4, t: "Mana Shankara Vara Prasad Garu", h: "Chiranjeevi", d: "Anil Ravipudi", y: 2026, g: "₹304.5 Cr", v: "blockbuster" }
-            ],
-            telugu: [
-                { r: 1, t: "Baahubali 2", h: "Prabhas", d: "S.S. Rajamouli", y: 2017, g: "₹1,810 Cr", v: "blockbuster" },
-                { r: 2, t: "Pushpa 2: The Rule", h: "Allu Arjun", d: "Sukumar", y: 2024, g: "₹1,750 Cr", v: "blockbuster" },
-                { r: 3, t: "RRR", h: "NTR, Ram Charan", d: "S.S. Rajamouli", y: 2022, g: "₹1,316 Cr", v: "blockbuster" },
-                { r: 4, t: "Mana Shankara Vara Prasad Garu", h: "Chiranjeevi", d: "Anil Ravipudi", y: 2026, g: "₹304.5 Cr", v: "blockbuster" }
-            ],
-            hindi: [
-                { r: 1, t: "Dangal", h: "Aamir Khan", d: "Nitesh Tiwari", y: 2016, g: "₹2,024 Cr", v: "blockbuster" },
-                { r: 2, t: "Dhurandhar", h: "Ranveer Singh", d: "Aditya Dhar", y: 2025, g: "₹1,328 Cr", v: "blockbuster" },
-                { r: 3, t: "Jawan", h: "Shah Rukh Khan", d: "Atlee", y: 2023, g: "₹1,148 Cr", v: "blockbuster" }
-            ],
-            mahesh: [
-                { r: "2027", t: "Varanasi (SSMB29)", h: "Mahesh Babu", d: "S.S. Rajamouli", y: "Summer 2027", g: "Budget: ₹1,300 Cr", v: "upcoming" },
-                { r: 1, t: "Sarileru Neekevvaru", h: "Mahesh Babu", d: "Anil Ravipudi", y: 2020, g: "₹260 Cr", v: "blockbuster" },
-                { r: 2, t: "Sarkaru Vaari Paata", h: "Mahesh Babu", d: "Parasuram", y: 2022, g: "₹230 Cr", v: "hit" },
-                { r: 3, t: "Guntur Kaaram", h: "Mahesh Babu", d: "Trivikram", y: 2024, g: "₹184 Cr", v: "average" }
-            ],
-            upcoming: [
-                { r: "2026", t: "Border 2", h: "Sunny Deol", d: "Anurag Singh", y: "Jan 23, 2026", g: "High Buzz", v: "upcoming" },
-                { r: "2026", t: "Toxic", h: "Yash", d: "Geetu Mohandas", y: "Mar 19, 2026", g: "High Buzz", v: "upcoming" },
-                { r: "2026", t: "Dhurandhar 2", h: "Ranveer Singh", d: "Aditya Dhar", y: "Mar 19, 2026", g: "Sequel", v: "upcoming" }
-            ]
-        };
+        const DB_URL = "https://script.google.com/macros/s/AKfycbyVfkPw3wYF3gzaY9pjbW_CWvHerNBnF2oE5rlIuDrtxmDNqhIt3EgboJDRs8U_wsYTWw/exec"; 
+        
+        let allMovies = [];
+        let currentTab = 'latest';
 
         function enterSite() {
             document.getElementById('welcome-page').style.transform = 'translateY(-100%)';
             setTimeout(() => {
                 document.getElementById('welcome-page').style.display = 'none';
                 document.getElementById('main-dashboard').style.display = 'block';
-                renderTable('telugu');
-            }, 800);
+                loadData();
+            }, 600);
+        }
+
+        async function loadData() {
+            try {
+                const response = await fetch(DB_URL);
+                allMovies = await response.json();
+                renderTable();
+            } catch (e) { 
+                console.error("Fetch failed"); 
+                document.getElementById('tableContent').innerHTML = "<p style='text-align:center'>Data connection pending... Ensure sheet contains data.</p>";
+            }
         }
 
         function switchTab(tab) {
+            currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
-            renderTable(tab);
+            renderTable();
         }
 
-        function renderTable(tab) {
-            const data = movieData[tab] || [];
-            let html = `<div class="table-wrapper"><table id="masterTable"><thead><tr><th>Rank</th><th>Movie Details</th><th>Worldwide Gross</th><th>Verdict</th></tr></thead><tbody>`;
-            data.forEach(m => {
+        function renderTable() {
+            let filtered = (currentTab === 'latest') ? [...allMovies].reverse().slice(0, 10) : allMovies.filter(m => m.ind.toLowerCase() === currentTab);
+            let html = `<div class="table-wrapper"><table><thead><tr><th>Movie</th><th>Collection</th><th>Verdict</th></tr></thead><tbody>`;
+            
+            if (filtered.length === 0) {
+                html += `<tr><td colspan="3" style="text-align:center">No records found for this category.</td></tr>`;
+            }
+
+            filtered.forEach(m => {
+                const liveBadge = (m.y == 2026) ? '<span class="badge-live">LIVE</span>' : '';
+                const vClass = m.v ? m.v.toLowerCase() : 'hit';
                 html += `<tr>
-                    <td>#${m.r}</td>
-                    <td><strong>${m.t}</strong><span class="meta">${m.h} | ${m.d} | ${m.y}</span></td>
-                    <td style="color:var(--green)"><b>${m.g}</b></td>
-                    <td><span class="verdict ${m.v}">${m.v}</span></td>
+                    <td><strong>${m.t}</strong>${liveBadge}<br><span style="font-size:0.75rem; opacity:0.7;">${m.ind ? m.ind.toUpperCase() : 'N/A'} | ${m.y}</span></td>
+                    <td style="color:var(--green); font-weight:bold;">${m.g}</td>
+                    <td><span class="verdict ${vClass}">${m.v}</span></td>
                 </tr>`;
             });
             html += `</tbody></table></div>`;
             document.getElementById('tableContent').innerHTML = html;
         }
 
-        function filterData() {
-            const query = document.getElementById('masterSearch').value.toLowerCase();
-            const rows = document.getElementById('masterTable').getElementsByTagName('tr');
-            for (let i = 1; i < rows.length; i++) {
-                rows[i].style.display = rows[i].innerText.toLowerCase().includes(query) ? "" : "none";
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            document.getElementById('themeBtn').innerHTML = isLight ? "☀️" : "🌙";
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        }
+
+        function adminLogin() {
+            if(prompt("Enter Admin Password:") === "admin123") {
+                document.getElementById('adminPanel').style.display = 'block';
+                window.scrollTo(0,0);
             }
         }
-        // Locate this in your <script> section:
-const DB_URL = "https://script.google.com/macros/s/AKfycbyVfkPw3wYF3gzaY9pjbW_CWvHerNBnF2oE5rlIuDrtxmDNqhIt3EgboJDRs8U_wsYTWw/exec";
 
-// This function will now pull live data for every fan who visits
-async function loadData() {
-    const response = await fetch(DB_URL);
-    const allMovies = await response.json();
-    // Render logic continues...
-}
+        async function submitToSheet() {
+            const data = { 
+                t: document.getElementById('newTitle').value, 
+                y: document.getElementById('newYear').value, 
+                ind: document.getElementById('newInd').value, 
+                g: document.getElementById('newGross').value, 
+                v: document.getElementById('newVerdict').value 
+            };
+            
+            if (!data.t || !data.g) {
+                alert("Please fill in Title and Collection.");
+                return;
+            }
+
+            const res = await fetch(DB_URL, { method: 'POST', body: JSON.stringify(data) });
+            if(res.ok) { 
+                alert("Data Published Successfully!"); 
+                loadData(); 
+                document.getElementById('adminPanel').style.display = 'none';
+            }
+        }
+
+        window.onload = () => {
+            if(localStorage.getItem('theme') === 'light') toggleTheme();
+        };
     </script>
 </body>
-
 </html>
-
